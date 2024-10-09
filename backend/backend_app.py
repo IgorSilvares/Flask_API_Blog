@@ -18,7 +18,7 @@ def get_posts():
 def add_post():
     data = request.get_json()
 
-    if 'title' not in data or 'content' not in data:
+    if 'title' not in data or 'content' not in data or not data['title'].strip() or not data['content'].strip():
         return jsonify({'error': 'Title or content missing'}), 400
 
     title = data['title']
@@ -54,6 +54,19 @@ def update_post(post_id):
             post['content'] = data['content']
             return jsonify({'message': 'Post with id ' + str(post_id) +  ' has been updated successfully'}), 200
     return jsonify({'error': 'Post not found'}), 404
+
+
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    query_title = request.args.get('title')
+    query_content = request.args.get('content')
+    results = []
+    for post in POSTS:
+        if query_title and query_title.lower() in post['title'].lower():
+            results.append(post)
+        elif query_content and query_content.lower() in post['content'].lower():
+            results.append(post)
+    return jsonify(results)
 
 
 if __name__ == '__main__':
